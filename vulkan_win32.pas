@@ -13,243 +13,243 @@
 
 interface //#################################################################### ■
 
-#define VK_KHR_win32_surface 1
-#define VK_KHR_WIN32_SURFACE_SPEC_VERSION 6
-#define VK_KHR_WIN32_SURFACE_EXTENSION_NAME "VK_KHR_win32_surface"
-typedef VkFlags VkWin32SurfaceCreateFlagsKHR;
-typedef struct VkWin32SurfaceCreateInfoKHR {
-    VkStructureType                 sType;
-    const void*                     pNext;
-    VkWin32SurfaceCreateFlagsKHR    flags;
-    HINSTANCE                       hinstance;
-    HWND                            hwnd;
-} VkWin32SurfaceCreateInfoKHR;
+const VK_KHR_win32_surface = 1;
+const VK_KHR_WIN32_SURFACE_SPEC_VERSION = 6;
+const VK_KHR_WIN32_SURFACE_EXTENSION_NAME = "VK_KHR_win32_surface";
+type VkWin32SurfaceCreateFlagsKHR = VkFlags;
+type VkWin32SurfaceCreateInfoKHR = record
+       sType :VkStructureType;
+       pNext :P_void;
+       flags :VkWin32SurfaceCreateFlagsKHR;
+       hinstance :HINSTANCE;
+       hwnd :HWND;
+     end;
 
-typedef VkResult (VKAPI_PTR *PFN_vkCreateWin32SurfaceKHR)(VkInstance instance, const VkWin32SurfaceCreateInfoKHR* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkSurfaceKHR* pSurface);
-typedef VkBool32 (VKAPI_PTR *PFN_vkGetPhysicalDeviceWin32PresentationSupportKHR)(VkPhysicalDevice physicalDevice, uint32_t queueFamilyIndex);
+type PFN_vkCreateWin32SurfaceKHR = function(instance_:VkInstance; const pCreateInfo_:P_VkWin32SurfaceCreateInfoKHR; const pAllocator_:P_VkAllocationCallbacks; pSurface_:P_VkSurfaceKHR ) :VkResult;
+type PFN_vkGetPhysicalDeviceWin32PresentationSupportKHR = function(physicalDevice_:VkPhysicalDevice; queueFamilyIndex_:uint32_t ) :VkBool32;
 
-#ifndef VK_NO_PROTOTYPES
-VKAPI_ATTR VkResult VKAPI_CALL vkCreateWin32SurfaceKHR(
-    VkInstance                                  instance,
-    const VkWin32SurfaceCreateInfoKHR*          pCreateInfo,
-    const VkAllocationCallbacks*                pAllocator,
-    VkSurfaceKHR*                               pSurface);
+{$IFNDEF VK_NO_PROTOTYPES }
+function vkCreateWin32SurfaceKHR(
+    instance_:VkInstance;
+    const pCreateInfo_:P_VkWin32SurfaceCreateInfoKHR;
+    const pAllocator_:P_VkAllocationCallbacks;
+    pSurface_:P_VkSurfaceKHR ) :VkResult; stdcall; external DLLNAME;
 
-VKAPI_ATTR VkBool32 VKAPI_CALL vkGetPhysicalDeviceWin32PresentationSupportKHR(
-    VkPhysicalDevice                            physicalDevice,
-    uint32_t                                    queueFamilyIndex);
-#endif
-
-
-#define VK_KHR_external_memory_win32 1
-#define VK_KHR_EXTERNAL_MEMORY_WIN32_SPEC_VERSION 1
-#define VK_KHR_EXTERNAL_MEMORY_WIN32_EXTENSION_NAME "VK_KHR_external_memory_win32"
-typedef struct VkImportMemoryWin32HandleInfoKHR {
-    VkStructureType                       sType;
-    const void*                           pNext;
-    VkExternalMemoryHandleTypeFlagBits    handleType;
-    HANDLE                                handle;
-    LPCWSTR                               name;
-} VkImportMemoryWin32HandleInfoKHR;
-
-typedef struct VkExportMemoryWin32HandleInfoKHR {
-    VkStructureType               sType;
-    const void*                   pNext;
-    const SECURITY_ATTRIBUTES*    pAttributes;
-    DWORD                         dwAccess;
-    LPCWSTR                       name;
-} VkExportMemoryWin32HandleInfoKHR;
-
-typedef struct VkMemoryWin32HandlePropertiesKHR {
-    VkStructureType    sType;
-    void*              pNext;
-    uint32_t           memoryTypeBits;
-} VkMemoryWin32HandlePropertiesKHR;
-
-typedef struct VkMemoryGetWin32HandleInfoKHR {
-    VkStructureType                       sType;
-    const void*                           pNext;
-    VkDeviceMemory                        memory;
-    VkExternalMemoryHandleTypeFlagBits    handleType;
-} VkMemoryGetWin32HandleInfoKHR;
-
-typedef VkResult (VKAPI_PTR *PFN_vkGetMemoryWin32HandleKHR)(VkDevice device, const VkMemoryGetWin32HandleInfoKHR* pGetWin32HandleInfo, HANDLE* pHandle);
-typedef VkResult (VKAPI_PTR *PFN_vkGetMemoryWin32HandlePropertiesKHR)(VkDevice device, VkExternalMemoryHandleTypeFlagBits handleType, HANDLE handle, VkMemoryWin32HandlePropertiesKHR* pMemoryWin32HandleProperties);
-
-#ifndef VK_NO_PROTOTYPES
-VKAPI_ATTR VkResult VKAPI_CALL vkGetMemoryWin32HandleKHR(
-    VkDevice                                    device,
-    const VkMemoryGetWin32HandleInfoKHR*        pGetWin32HandleInfo,
-    HANDLE*                                     pHandle);
-
-VKAPI_ATTR VkResult VKAPI_CALL vkGetMemoryWin32HandlePropertiesKHR(
-    VkDevice                                    device,
-    VkExternalMemoryHandleTypeFlagBits          handleType,
-    HANDLE                                      handle,
-    VkMemoryWin32HandlePropertiesKHR*           pMemoryWin32HandleProperties);
-#endif
+function vkGetPhysicalDeviceWin32PresentationSupportKHR(
+    physicalDevice_:VkPhysicalDevice;
+    queueFamilyIndex_:uint32_t ) :VkBool32; stdcall; external DLLNAME;
+{$ENDIF}
 
 
-#define VK_KHR_win32_keyed_mutex 1
-#define VK_KHR_WIN32_KEYED_MUTEX_SPEC_VERSION 1
-#define VK_KHR_WIN32_KEYED_MUTEX_EXTENSION_NAME "VK_KHR_win32_keyed_mutex"
-typedef struct VkWin32KeyedMutexAcquireReleaseInfoKHR {
-    VkStructureType          sType;
-    const void*              pNext;
-    uint32_t                 acquireCount;
-    const VkDeviceMemory*    pAcquireSyncs;
-    const uint64_t*          pAcquireKeys;
-    const uint32_t*          pAcquireTimeouts;
-    uint32_t                 releaseCount;
-    const VkDeviceMemory*    pReleaseSyncs;
-    const uint64_t*          pReleaseKeys;
-} VkWin32KeyedMutexAcquireReleaseInfoKHR;
+const VK_KHR_external_memory_win32 = 1;
+const VK_KHR_EXTERNAL_MEMORY_WIN32_SPEC_VERSION = 1;
+const VK_KHR_EXTERNAL_MEMORY_WIN32_EXTENSION_NAME = "VK_KHR_external_memory_win32";
+type VkImportMemoryWin32HandleInfoKHR = record
+       sType :VkStructureType;
+       pNext :P_void;
+       handleType :VkExternalMemoryHandleTypeFlagBits;
+       handle :HANDLE;
+       name :LPCWSTR;
+     end;
+
+type VkExportMemoryWin32HandleInfoKHR = record
+       sType :VkStructureType;
+       pNext :P_void;
+       pAttributes :P_SECURITY_ATTRIBUTES;
+       dwAccess :DWORD;
+       name :LPCWSTR;
+     end;
+
+type VkMemoryWin32HandlePropertiesKHR = record
+       sType :VkStructureType;
+       pNext :P_void;
+       memoryTypeBits :uint32_t;
+     end;
+
+type VkMemoryGetWin32HandleInfoKHR = record
+       sType :VkStructureType;
+       pNext :P_void;
+       memory :VkDeviceMemory;
+       handleType :VkExternalMemoryHandleTypeFlagBits;
+     end;
+
+type PFN_vkGetMemoryWin32HandleKHR = function(device_:VkDevice; const pGetWin32HandleInfo_:P_VkMemoryGetWin32HandleInfoKHR; pHandle_:P_HANDLE ) :VkResult;
+type PFN_vkGetMemoryWin32HandlePropertiesKHR = function(device_:VkDevice; handleType_:VkExternalMemoryHandleTypeFlagBits; handle_:HANDLE; pMemoryWin32HandleProperties_:P_VkMemoryWin32HandlePropertiesKHR ) :VkResult;
+
+{$IFNDEF VK_NO_PROTOTYPES }
+function vkGetMemoryWin32HandleKHR(
+    device_:VkDevice;
+    const pGetWin32HandleInfo_:P_VkMemoryGetWin32HandleInfoKHR;
+    pHandle_:P_HANDLE ) :VkResult; stdcall; external DLLNAME;
+
+function vkGetMemoryWin32HandlePropertiesKHR(
+    device_:VkDevice;
+    handleType_:VkExternalMemoryHandleTypeFlagBits;
+    handle_:HANDLE;
+    pMemoryWin32HandleProperties_:P_VkMemoryWin32HandlePropertiesKHR ) :VkResult; stdcall; external DLLNAME;
+{$ENDIF}
 
 
-
-#define VK_KHR_external_semaphore_win32 1
-#define VK_KHR_EXTERNAL_SEMAPHORE_WIN32_SPEC_VERSION 1
-#define VK_KHR_EXTERNAL_SEMAPHORE_WIN32_EXTENSION_NAME "VK_KHR_external_semaphore_win32"
-typedef struct VkImportSemaphoreWin32HandleInfoKHR {
-    VkStructureType                          sType;
-    const void*                              pNext;
-    VkSemaphore                              semaphore;
-    VkSemaphoreImportFlags                   flags;
-    VkExternalSemaphoreHandleTypeFlagBits    handleType;
-    HANDLE                                   handle;
-    LPCWSTR                                  name;
-} VkImportSemaphoreWin32HandleInfoKHR;
-
-typedef struct VkExportSemaphoreWin32HandleInfoKHR {
-    VkStructureType               sType;
-    const void*                   pNext;
-    const SECURITY_ATTRIBUTES*    pAttributes;
-    DWORD                         dwAccess;
-    LPCWSTR                       name;
-} VkExportSemaphoreWin32HandleInfoKHR;
-
-typedef struct VkD3D12FenceSubmitInfoKHR {
-    VkStructureType    sType;
-    const void*        pNext;
-    uint32_t           waitSemaphoreValuesCount;
-    const uint64_t*    pWaitSemaphoreValues;
-    uint32_t           signalSemaphoreValuesCount;
-    const uint64_t*    pSignalSemaphoreValues;
-} VkD3D12FenceSubmitInfoKHR;
-
-typedef struct VkSemaphoreGetWin32HandleInfoKHR {
-    VkStructureType                          sType;
-    const void*                              pNext;
-    VkSemaphore                              semaphore;
-    VkExternalSemaphoreHandleTypeFlagBits    handleType;
-} VkSemaphoreGetWin32HandleInfoKHR;
-
-typedef VkResult (VKAPI_PTR *PFN_vkImportSemaphoreWin32HandleKHR)(VkDevice device, const VkImportSemaphoreWin32HandleInfoKHR* pImportSemaphoreWin32HandleInfo);
-typedef VkResult (VKAPI_PTR *PFN_vkGetSemaphoreWin32HandleKHR)(VkDevice device, const VkSemaphoreGetWin32HandleInfoKHR* pGetWin32HandleInfo, HANDLE* pHandle);
-
-#ifndef VK_NO_PROTOTYPES
-VKAPI_ATTR VkResult VKAPI_CALL vkImportSemaphoreWin32HandleKHR(
-    VkDevice                                    device,
-    const VkImportSemaphoreWin32HandleInfoKHR*  pImportSemaphoreWin32HandleInfo);
-
-VKAPI_ATTR VkResult VKAPI_CALL vkGetSemaphoreWin32HandleKHR(
-    VkDevice                                    device,
-    const VkSemaphoreGetWin32HandleInfoKHR*     pGetWin32HandleInfo,
-    HANDLE*                                     pHandle);
-#endif
-
-
-#define VK_KHR_external_fence_win32 1
-#define VK_KHR_EXTERNAL_FENCE_WIN32_SPEC_VERSION 1
-#define VK_KHR_EXTERNAL_FENCE_WIN32_EXTENSION_NAME "VK_KHR_external_fence_win32"
-typedef struct VkImportFenceWin32HandleInfoKHR {
-    VkStructureType                      sType;
-    const void*                          pNext;
-    VkFence                              fence;
-    VkFenceImportFlags                   flags;
-    VkExternalFenceHandleTypeFlagBits    handleType;
-    HANDLE                               handle;
-    LPCWSTR                              name;
-} VkImportFenceWin32HandleInfoKHR;
-
-typedef struct VkExportFenceWin32HandleInfoKHR {
-    VkStructureType               sType;
-    const void*                   pNext;
-    const SECURITY_ATTRIBUTES*    pAttributes;
-    DWORD                         dwAccess;
-    LPCWSTR                       name;
-} VkExportFenceWin32HandleInfoKHR;
-
-typedef struct VkFenceGetWin32HandleInfoKHR {
-    VkStructureType                      sType;
-    const void*                          pNext;
-    VkFence                              fence;
-    VkExternalFenceHandleTypeFlagBits    handleType;
-} VkFenceGetWin32HandleInfoKHR;
-
-typedef VkResult (VKAPI_PTR *PFN_vkImportFenceWin32HandleKHR)(VkDevice device, const VkImportFenceWin32HandleInfoKHR* pImportFenceWin32HandleInfo);
-typedef VkResult (VKAPI_PTR *PFN_vkGetFenceWin32HandleKHR)(VkDevice device, const VkFenceGetWin32HandleInfoKHR* pGetWin32HandleInfo, HANDLE* pHandle);
-
-#ifndef VK_NO_PROTOTYPES
-VKAPI_ATTR VkResult VKAPI_CALL vkImportFenceWin32HandleKHR(
-    VkDevice                                    device,
-    const VkImportFenceWin32HandleInfoKHR*      pImportFenceWin32HandleInfo);
-
-VKAPI_ATTR VkResult VKAPI_CALL vkGetFenceWin32HandleKHR(
-    VkDevice                                    device,
-    const VkFenceGetWin32HandleInfoKHR*         pGetWin32HandleInfo,
-    HANDLE*                                     pHandle);
-#endif
-
-
-#define VK_NV_external_memory_win32 1
-#define VK_NV_EXTERNAL_MEMORY_WIN32_SPEC_VERSION 1
-#define VK_NV_EXTERNAL_MEMORY_WIN32_EXTENSION_NAME "VK_NV_external_memory_win32"
-typedef struct VkImportMemoryWin32HandleInfoNV {
-    VkStructureType                      sType;
-    const void*                          pNext;
-    VkExternalMemoryHandleTypeFlagsNV    handleType;
-    HANDLE                               handle;
-} VkImportMemoryWin32HandleInfoNV;
-
-typedef struct VkExportMemoryWin32HandleInfoNV {
-    VkStructureType               sType;
-    const void*                   pNext;
-    const SECURITY_ATTRIBUTES*    pAttributes;
-    DWORD                         dwAccess;
-} VkExportMemoryWin32HandleInfoNV;
-
-typedef VkResult (VKAPI_PTR *PFN_vkGetMemoryWin32HandleNV)(VkDevice device, VkDeviceMemory memory, VkExternalMemoryHandleTypeFlagsNV handleType, HANDLE* pHandle);
-
-#ifndef VK_NO_PROTOTYPES
-VKAPI_ATTR VkResult VKAPI_CALL vkGetMemoryWin32HandleNV(
-    VkDevice                                    device,
-    VkDeviceMemory                              memory,
-    VkExternalMemoryHandleTypeFlagsNV           handleType,
-    HANDLE*                                     pHandle);
-#endif
-
-
-#define VK_NV_win32_keyed_mutex 1
-#define VK_NV_WIN32_KEYED_MUTEX_SPEC_VERSION 2
-#define VK_NV_WIN32_KEYED_MUTEX_EXTENSION_NAME "VK_NV_win32_keyed_mutex"
-typedef struct VkWin32KeyedMutexAcquireReleaseInfoNV {
-    VkStructureType          sType;
-    const void*              pNext;
-    uint32_t                 acquireCount;
-    const VkDeviceMemory*    pAcquireSyncs;
-    const uint64_t*          pAcquireKeys;
-    const uint32_t*          pAcquireTimeoutMilliseconds;
-    uint32_t                 releaseCount;
-    const VkDeviceMemory*    pReleaseSyncs;
-    const uint64_t*          pReleaseKeys;
-} VkWin32KeyedMutexAcquireReleaseInfoNV;
+const VK_KHR_win32_keyed_mutex = 1;
+const VK_KHR_WIN32_KEYED_MUTEX_SPEC_VERSION = 1;
+const VK_KHR_WIN32_KEYED_MUTEX_EXTENSION_NAME = "VK_KHR_win32_keyed_mutex";
+type VkWin32KeyedMutexAcquireReleaseInfoKHR = record
+       sType :VkStructureType;
+       pNext :P_void;
+       acquireCount :uint32_t;
+       pAcquireSyncs :P_VkDeviceMemory;
+       pAcquireKeys :P_uint64_t;
+       pAcquireTimeouts :P_uint32_t;
+       releaseCount :uint32_t;
+       pReleaseSyncs :P_VkDeviceMemory;
+       pReleaseKeys :P_uint64_t;
+     end;
 
 
 
-#define VK_EXT_full_screen_exclusive 1
-#define VK_EXT_FULL_SCREEN_EXCLUSIVE_SPEC_VERSION 4
-#define VK_EXT_FULL_SCREEN_EXCLUSIVE_EXTENSION_NAME "VK_EXT_full_screen_exclusive"
+const VK_KHR_external_semaphore_win32 = 1;
+const VK_KHR_EXTERNAL_SEMAPHORE_WIN32_SPEC_VERSION = 1;
+const VK_KHR_EXTERNAL_SEMAPHORE_WIN32_EXTENSION_NAME = "VK_KHR_external_semaphore_win32";
+type VkImportSemaphoreWin32HandleInfoKHR = record
+       sType :VkStructureType;
+       pNext :P_void;
+       semaphore :VkSemaphore;
+       flags :VkSemaphoreImportFlags;
+       handleType :VkExternalSemaphoreHandleTypeFlagBits;
+       handle :HANDLE;
+       name :LPCWSTR;
+     end;
+
+type VkExportSemaphoreWin32HandleInfoKHR = record
+       sType :VkStructureType;
+       pNext :P_void;
+       pAttributes :P_SECURITY_ATTRIBUTES;
+       dwAccess :DWORD;
+       name :LPCWSTR;
+     end;
+
+type VkD3D12FenceSubmitInfoKHR = record
+       sType :VkStructureType;
+       pNext :P_void;
+       waitSemaphoreValuesCount :uint32_t;
+       pWaitSemaphoreValues :P_uint64_t;
+       signalSemaphoreValuesCount :uint32_t;
+       pSignalSemaphoreValues :P_uint64_t;
+     end;
+
+type VkSemaphoreGetWin32HandleInfoKHR = record
+       sType :VkStructureType;
+       pNext :P_void;
+       semaphore :VkSemaphore;
+       handleType :VkExternalSemaphoreHandleTypeFlagBits;
+     end;
+
+type PFN_vkImportSemaphoreWin32HandleKHR = function(device_:VkDevice; const pImportSemaphoreWin32HandleInfo_:P_VkImportSemaphoreWin32HandleInfoKHR ) :VkResult;
+type PFN_vkGetSemaphoreWin32HandleKHR = function(device_:VkDevice; const pGetWin32HandleInfo_:P_VkSemaphoreGetWin32HandleInfoKHR; pHandle_:P_HANDLE ) :VkResult;
+
+{$IFNDEF VK_NO_PROTOTYPES }
+function vkImportSemaphoreWin32HandleKHR(
+    device_:VkDevice;
+    const pImportSemaphoreWin32HandleInfo_:P_VkImportSemaphoreWin32HandleInfoKHR ) :VkResult; stdcall; external DLLNAME;
+
+function vkGetSemaphoreWin32HandleKHR(
+    device_:VkDevice;
+    const pGetWin32HandleInfo_:P_VkSemaphoreGetWin32HandleInfoKHR;
+    pHandle_:P_HANDLE ) :VkResult; stdcall; external DLLNAME;
+{$ENDIF}
+
+
+const VK_KHR_external_fence_win32 = 1;
+const VK_KHR_EXTERNAL_FENCE_WIN32_SPEC_VERSION = 1;
+const VK_KHR_EXTERNAL_FENCE_WIN32_EXTENSION_NAME = "VK_KHR_external_fence_win32";
+type VkImportFenceWin32HandleInfoKHR = record
+       sType :VkStructureType;
+       pNext :P_void;
+       fence :VkFence;
+       flags :VkFenceImportFlags;
+       handleType :VkExternalFenceHandleTypeFlagBits;
+       handle :HANDLE;
+       name :LPCWSTR;
+     end;
+
+type VkExportFenceWin32HandleInfoKHR = record
+       sType :VkStructureType;
+       pNext :P_void;
+       pAttributes :P_SECURITY_ATTRIBUTES;
+       dwAccess :DWORD;
+       name :LPCWSTR;
+     end;
+
+type VkFenceGetWin32HandleInfoKHR = record
+       sType :VkStructureType;
+       pNext :P_void;
+       fence :VkFence;
+       handleType :VkExternalFenceHandleTypeFlagBits;
+     end;
+
+type PFN_vkImportFenceWin32HandleKHR = function(device_:VkDevice; const pImportFenceWin32HandleInfo_:P_VkImportFenceWin32HandleInfoKHR ) :VkResult;
+type PFN_vkGetFenceWin32HandleKHR = function(device_:VkDevice; const pGetWin32HandleInfo_:P_VkFenceGetWin32HandleInfoKHR; pHandle_:P_HANDLE ) :VkResult;
+
+{$IFNDEF VK_NO_PROTOTYPES }
+function vkImportFenceWin32HandleKHR(
+    device_:VkDevice;
+    const pImportFenceWin32HandleInfo_:P_VkImportFenceWin32HandleInfoKHR ) :VkResult; stdcall; external DLLNAME;
+
+function vkGetFenceWin32HandleKHR(
+    device_:VkDevice;
+    const pGetWin32HandleInfo_:P_VkFenceGetWin32HandleInfoKHR;
+    pHandle_:P_HANDLE ) :VkResult; stdcall; external DLLNAME;
+{$ENDIF}
+
+
+const VK_NV_external_memory_win32 = 1;
+const VK_NV_EXTERNAL_MEMORY_WIN32_SPEC_VERSION = 1;
+const VK_NV_EXTERNAL_MEMORY_WIN32_EXTENSION_NAME = "VK_NV_external_memory_win32";
+type VkImportMemoryWin32HandleInfoNV = record
+       sType :VkStructureType;
+       pNext :P_void;
+       handleType :VkExternalMemoryHandleTypeFlagsNV;
+       handle :HANDLE;
+     end;
+
+type VkExportMemoryWin32HandleInfoNV = record
+       sType :VkStructureType;
+       pNext :P_void;
+       pAttributes :P_SECURITY_ATTRIBUTES;
+       dwAccess :DWORD;
+     end;
+
+type PFN_vkGetMemoryWin32HandleNV = function(device_:VkDevice; memory_:VkDeviceMemory; handleType_:VkExternalMemoryHandleTypeFlagsNV; pHandle_:P_HANDLE ) :VkResult;
+
+{$IFNDEF VK_NO_PROTOTYPES }
+function vkGetMemoryWin32HandleNV(
+    device_:VkDevice;
+    memory_:VkDeviceMemory;
+    handleType_:VkExternalMemoryHandleTypeFlagsNV;
+    pHandle_:P_HANDLE ) :VkResult; stdcall; external DLLNAME;
+{$ENDIF}
+
+
+const VK_NV_win32_keyed_mutex = 1;
+const VK_NV_WIN32_KEYED_MUTEX_SPEC_VERSION = 2;
+const VK_NV_WIN32_KEYED_MUTEX_EXTENSION_NAME = "VK_NV_win32_keyed_mutex";
+type VkWin32KeyedMutexAcquireReleaseInfoNV = record
+       sType :VkStructureType;
+       pNext :P_void;
+       acquireCount :uint32_t;
+       pAcquireSyncs :P_VkDeviceMemory;
+       pAcquireKeys :P_uint64_t;
+       pAcquireTimeoutMilliseconds :P_uint32_t;
+       releaseCount :uint32_t;
+       pReleaseSyncs :P_VkDeviceMemory;
+       pReleaseKeys :P_uint64_t;
+     end;
+
+
+
+const VK_EXT_full_screen_exclusive = 1;
+const VK_EXT_FULL_SCREEN_EXCLUSIVE_SPEC_VERSION = 4;
+const VK_EXT_FULL_SCREEN_EXCLUSIVE_EXTENSION_NAME = "VK_EXT_full_screen_exclusive";
 
 typedef enum VkFullScreenExclusiveEXT {
     VK_FULL_SCREEN_EXCLUSIVE_DEFAULT_EXT = 0,
@@ -257,50 +257,50 @@ typedef enum VkFullScreenExclusiveEXT {
     VK_FULL_SCREEN_EXCLUSIVE_DISALLOWED_EXT = 2,
     VK_FULL_SCREEN_EXCLUSIVE_APPLICATION_CONTROLLED_EXT = 3,
     VK_FULL_SCREEN_EXCLUSIVE_MAX_ENUM_EXT = 0x7FFFFFFF
-} VkFullScreenExclusiveEXT;
-typedef struct VkSurfaceFullScreenExclusiveInfoEXT {
-    VkStructureType             sType;
-    void*                       pNext;
-    VkFullScreenExclusiveEXT    fullScreenExclusive;
-} VkSurfaceFullScreenExclusiveInfoEXT;
+     end;
+type VkSurfaceFullScreenExclusiveInfoEXT = record
+       sType :VkStructureType;
+       pNext :P_void;
+       fullScreenExclusive :VkFullScreenExclusiveEXT;
+     end;
 
-typedef struct VkSurfaceCapabilitiesFullScreenExclusiveEXT {
-    VkStructureType    sType;
-    void*              pNext;
-    VkBool32           fullScreenExclusiveSupported;
-} VkSurfaceCapabilitiesFullScreenExclusiveEXT;
+type VkSurfaceCapabilitiesFullScreenExclusiveEXT = record
+       sType :VkStructureType;
+       pNext :P_void;
+       fullScreenExclusiveSupported :VkBool32;
+     end;
 
-typedef struct VkSurfaceFullScreenExclusiveWin32InfoEXT {
-    VkStructureType    sType;
-    const void*        pNext;
-    HMONITOR           hmonitor;
-} VkSurfaceFullScreenExclusiveWin32InfoEXT;
+type VkSurfaceFullScreenExclusiveWin32InfoEXT = record
+       sType :VkStructureType;
+       pNext :P_void;
+       hmonitor :HMONITOR;
+     end;
 
-typedef VkResult (VKAPI_PTR *PFN_vkGetPhysicalDeviceSurfacePresentModes2EXT)(VkPhysicalDevice physicalDevice, const VkPhysicalDeviceSurfaceInfo2KHR* pSurfaceInfo, uint32_t* pPresentModeCount, VkPresentModeKHR* pPresentModes);
-typedef VkResult (VKAPI_PTR *PFN_vkAcquireFullScreenExclusiveModeEXT)(VkDevice device, VkSwapchainKHR swapchain);
-typedef VkResult (VKAPI_PTR *PFN_vkReleaseFullScreenExclusiveModeEXT)(VkDevice device, VkSwapchainKHR swapchain);
-typedef VkResult (VKAPI_PTR *PFN_vkGetDeviceGroupSurfacePresentModes2EXT)(VkDevice device, const VkPhysicalDeviceSurfaceInfo2KHR* pSurfaceInfo, VkDeviceGroupPresentModeFlagsKHR* pModes);
+type PFN_vkGetPhysicalDeviceSurfacePresentModes2EXT = function(physicalDevice_:VkPhysicalDevice; const pSurfaceInfo_:P_VkPhysicalDeviceSurfaceInfo2KHR; pPresentModeCount_:P_uint32_t; pPresentModes_:P_VkPresentModeKHR ) :VkResult;
+type PFN_vkAcquireFullScreenExclusiveModeEXT = function(device_:VkDevice; swapchain_:VkSwapchainKHR ) :VkResult;
+type PFN_vkReleaseFullScreenExclusiveModeEXT = function(device_:VkDevice; swapchain_:VkSwapchainKHR ) :VkResult;
+type PFN_vkGetDeviceGroupSurfacePresentModes2EXT = function(device_:VkDevice; const pSurfaceInfo_:P_VkPhysicalDeviceSurfaceInfo2KHR; pModes_:P_VkDeviceGroupPresentModeFlagsKHR ) :VkResult;
 
-#ifndef VK_NO_PROTOTYPES
-VKAPI_ATTR VkResult VKAPI_CALL vkGetPhysicalDeviceSurfacePresentModes2EXT(
-    VkPhysicalDevice                            physicalDevice,
-    const VkPhysicalDeviceSurfaceInfo2KHR*      pSurfaceInfo,
-    uint32_t*                                   pPresentModeCount,
-    VkPresentModeKHR*                           pPresentModes);
+{$IFNDEF VK_NO_PROTOTYPES }
+function vkGetPhysicalDeviceSurfacePresentModes2EXT(
+    physicalDevice_:VkPhysicalDevice;
+    const pSurfaceInfo_:P_VkPhysicalDeviceSurfaceInfo2KHR;
+    pPresentModeCount_:P_uint32_t;
+    pPresentModes_:P_VkPresentModeKHR ) :VkResult; stdcall; external DLLNAME;
 
-VKAPI_ATTR VkResult VKAPI_CALL vkAcquireFullScreenExclusiveModeEXT(
-    VkDevice                                    device,
-    VkSwapchainKHR                              swapchain);
+function vkAcquireFullScreenExclusiveModeEXT(
+    device_:VkDevice;
+    swapchain_:VkSwapchainKHR ) :VkResult; stdcall; external DLLNAME;
 
-VKAPI_ATTR VkResult VKAPI_CALL vkReleaseFullScreenExclusiveModeEXT(
-    VkDevice                                    device,
-    VkSwapchainKHR                              swapchain);
+function vkReleaseFullScreenExclusiveModeEXT(
+    device_:VkDevice;
+    swapchain_:VkSwapchainKHR ) :VkResult; stdcall; external DLLNAME;
 
-VKAPI_ATTR VkResult VKAPI_CALL vkGetDeviceGroupSurfacePresentModes2EXT(
-    VkDevice                                    device,
-    const VkPhysicalDeviceSurfaceInfo2KHR*      pSurfaceInfo,
-    VkDeviceGroupPresentModeFlagsKHR*           pModes);
-#endif
+function vkGetDeviceGroupSurfacePresentModes2EXT(
+    device_:VkDevice;
+    const pSurfaceInfo_:P_VkPhysicalDeviceSurfaceInfo2KHR;
+    pModes_:P_VkDeviceGroupPresentModeFlagsKHR ) :VkResult; stdcall; external DLLNAME;
+{$ENDIF}
 
 implementation //############################################################### ■
 
