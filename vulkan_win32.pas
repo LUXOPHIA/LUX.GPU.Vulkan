@@ -1,23 +1,17 @@
-﻿#ifndef VULKAN_WIN32_H_
-#define VULKAN_WIN32_H_ 1
+﻿unit vulkan_win32;
 
-/*
+(*
 ** Copyright 2015-2021 The Khronos Group Inc.
 **
 ** SPDX-License-Identifier: Apache-2.0
-*/
+*)
 
-/*
+(*
 ** This header is generated from the Khronos Vulkan XML API Registry.
 **
-*/
+*)
 
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-
+interface //#################################################################### ■
 
 #define VK_KHR_win32_surface 1
 #define VK_KHR_WIN32_SURFACE_SPEC_VERSION 6
@@ -308,8 +302,6 @@ VKAPI_ATTR VkResult VKAPI_CALL vkGetDeviceGroupSurfacePresentModes2EXT(
     VkDeviceGroupPresentModeFlagsKHR*           pModes);
 #endif
 
-#ifdef __cplusplus
-}
-#endif
+implementation //############################################################### ■
 
-#endif
+end. //######################################################################### ■
