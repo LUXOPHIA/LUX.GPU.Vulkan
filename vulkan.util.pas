@@ -225,7 +225,7 @@ function memory_type_from_properties( var info:T_sample_info; typeBits:T_uint32_
 
 //////////////////////////////////////////////////////////////////////////////// 15-draw_cube
 
-function optionMatch( const option_:P_char; optionLine_:P_char ) :T_bool;
+function optionMatch( const option_:String; optionLine_:String ) :T_bool;
 procedure process_command_line_args( var info_:T_sample_info );
 procedure wait_seconds( seconds_:T_int );
 procedure set_image_layout( var info_:T_sample_info; image_:VkImage; aspectMask_:VkImageAspectFlags; old_image_layout_:VkImageLayout;
@@ -267,10 +267,10 @@ end;
 
 //////////////////////////////////////////////////////////////////////////////// 15-draw_cube
 
-function optionMatch( const option_:P_char; optionLine_:P_char ) :T_bool;
+function optionMatch( const option_:String; optionLine_:String ) :T_bool;
 begin
      if option_ = optionLine_ then Result := True
-                            else Result := False;
+                              else Result := False;
 end;
 
 procedure process_command_line_args( var info_:T_sample_info );
@@ -279,9 +279,9 @@ var
 begin
      for i := 1 to ParamCount-1 do
      begin
-          if optionMatch( '--save-images', P_char( ParamStr(i) ) ) then info_.save_images := true
+          if optionMatch( '--save-images', ParamStr( i ) ) then info_.save_images := true
           else
-          if optionMatch( '--help', P_char( ParamStr(i) ) ) or optionMatch( '-h', P_char( ParamStr(i) ) ) then
+          if optionMatch( '--help', ParamStr( i ) ) or optionMatch( '-h', ParamStr( i ) ) then
           begin
                Log.d( #10'Other options:' );
                Log.d( #9'--save-images'#10
@@ -291,7 +291,7 @@ begin
           end
           else
           begin
-               Log.d( #10'Unrecognized option: ' + ParamStr(i) );
+               Log.d( #10'Unrecognized option: ' + ParamStr( i ) );
                Log.d( #10'Use --help or -h for option list.' );
                Exit;
           end;
@@ -333,21 +333,25 @@ begin
           image_memory_barrier.srcAccessMask := Ord( VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT );
 
        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
-          image_memory_barrier.srcAccessMask := Ord( VK_ACCESS_TRANSFER_WRITE_BIT );
+          image_memory_barrier.srcAccessMask := Ord( VK_ACCESS_TRANSFER_WRITE_BIT         );
 
        VK_IMAGE_LAYOUT_PREINITIALIZED:
-          image_memory_barrier.srcAccessMask := Ord( VK_ACCESS_HOST_WRITE_BIT );
+          image_memory_barrier.srcAccessMask := Ord( VK_ACCESS_HOST_WRITE_BIT             );
      end;
 
      case new_image_layout_ of
        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
-          image_memory_barrier.dstAccessMask := Ord( VK_ACCESS_TRANSFER_WRITE_BIT );
+          image_memory_barrier.dstAccessMask := Ord( VK_ACCESS_TRANSFER_WRITE_BIT                 );
+
        VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL:
-          image_memory_barrier.dstAccessMask := Ord( VK_ACCESS_TRANSFER_READ_BIT );
+          image_memory_barrier.dstAccessMask := Ord( VK_ACCESS_TRANSFER_READ_BIT                  );
+
        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:
-          image_memory_barrier.dstAccessMask := Ord( VK_ACCESS_SHADER_READ_BIT );
+          image_memory_barrier.dstAccessMask := Ord( VK_ACCESS_SHADER_READ_BIT                    );
+
        VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL:
-          image_memory_barrier.dstAccessMask := Ord( VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT );
+          image_memory_barrier.dstAccessMask := Ord( VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT         );
+
        VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL:
           image_memory_barrier.dstAccessMask := Ord( VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT );
      end;
@@ -376,9 +380,9 @@ var
    sr_layout         :VkSubresourceLayout;
    ptr               :P_char;
    F                 :TFileStream;
-   S                 :AnsiString;
-   row               :P_int;
-   swapped           :T_int;
+   S                 :String;
+   row               :P_uint32_t;
+   swapped           :T_uint32_t;
 begin
      image_create_info.sType                 := VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
      image_create_info.pNext                 := nil;
@@ -431,6 +435,7 @@ begin
      cmd_buf_info.pInheritanceInfo := nil;
 
      res := vkBeginCommandBuffer( info_.cmd, @cmd_buf_info );
+     Assert( res = VK_SUCCESS );
      set_image_layout( info_, mappableImage, Ord( VK_IMAGE_ASPECT_COLOR_BIT ), VK_IMAGE_LAYOUT_UNDEFINED,
                        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, Ord( VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT ), Ord( VK_PIPELINE_STAGE_TRANSFER_BIT ) );
 
@@ -506,13 +511,14 @@ begin
      Inc( ptr, sr_layout.offset );
      F := TFileStream.Create( filename, fmCreate );
 
-     S := 'P6'                                               + #13#10;  F.Write( PAnsiChar( S )^, Length( S ) );
-     S := info_.width.ToString + ' ' + info_.height.ToString + #13#10;  F.Write( PAnsiChar( S )^, Length( S ) );
-     S := '255'                                              + #13#10;  F.Write( PAnsiChar( S )^, Length( S ) );
+     S := 'P6'                                               + #13#10;  F.Write( BytesOf( S ), Length( S ) );
+     S := info_.width.ToString + ' ' + info_.height.ToString + #13#10;  F.Write( BytesOf( S ), Length( S ) );
+     S := '255'                                              + #13#10;  F.Write( BytesOf( S ), Length( S ) );
 
-     row := P_int( ptr );
      for y := 0 to info_.height-1 do
      begin
+          row := P_uint32_t( ptr );
+
           if ( info_.format = VK_FORMAT_B8G8R8A8_UNORM ) or ( info_.format = VK_FORMAT_B8G8R8A8_SRGB ) then
           begin
                for x := 0 to info_.width-1 do
