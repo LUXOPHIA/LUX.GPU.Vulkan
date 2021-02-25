@@ -211,6 +211,12 @@ const //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
      (* Amount of time, in nanoseconds, to wait for a command buffer to complete *)
      FENCE_TIMEOUT = 100000000;
 
+     (* Number of viewports and number of scissors have to be the same *)
+     (* at pipeline creation and in any call to set them dynamically   *)
+     (* They also have to be the same as each other                    *)
+     NUM_VIEWPORTS = 1;
+     NUM_SCISSORS  = NUM_VIEWPORTS;
+
 //var //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$【変数】
 
 //$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$【ルーチン】
