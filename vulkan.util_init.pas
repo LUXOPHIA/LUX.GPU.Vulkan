@@ -114,6 +114,16 @@ procedure destroy_command_pool( var info_:T_sample_info );
 procedure init_framebuffers( var info_:T_sample_info; include_depth:T_bool );
 procedure destroy_framebuffers( var info_:T_sample_info );
 
+//////////////////////////////////////////////////////////////////////////////// 14-init_pipeline
+
+procedure init_vertex_buffer( var info_:T_sample_info; const vertexData_:P_void; dataSize_:T_uint32_t; dataStride_:T_uint32_t; use_texture_:T_bool );
+procedure init_descriptor_pool( var info_:T_sample_info; use_texture_:T_bool );
+procedure init_descriptor_set( var info_:T_sample_info; use_texture_:T_bool );
+procedure init_shaders( var info_:T_sample_info; const vertShaderCI_:P_VkShaderModuleCreateInfo; const fragShaderCI_:P_VkShaderModuleCreateInfo );
+procedure destroy_descriptor_pool( var info_:T_sample_info );
+procedure destroy_vertex_buffer( var info_:T_sample_info );
+procedure destroy_shaders( var info_:T_sample_info );
+
 implementation //############################################################### ■
 
 uses System.Types, System.Math, System.SysUtils,
@@ -1220,6 +1230,189 @@ var
 begin
      for i := 0 to info_.swapchainImageCount-1 do vkDestroyFramebuffer( info_.device, info_.framebuffers[i], nil );
      info_.framebuffers := nil;
+end;
+
+//////////////////////////////////////////////////////////////////////////////// 14-init_pipeline
+
+procedure init_vertex_buffer( var info_:T_sample_info; const vertexData_:P_void; dataSize_:T_uint32_t; dataStride_:T_uint32_t; use_texture_:T_bool );
+var
+   res        :VkResult;
+   pass       :T_bool;
+   buf_info   :VkBufferCreateInfo;
+   mem_reqs   :VkMemoryRequirements;
+   alloc_info :VkMemoryAllocateInfo;
+   pData      :P_uint8_t;
+begin
+     buf_info.sType                 := VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+     buf_info.pNext                 := nil;
+     buf_info.usage                 := Ord( VK_BUFFER_USAGE_VERTEX_BUFFER_BIT );
+     buf_info.size                  := dataSize_;
+     buf_info.queueFamilyIndexCount := 0;
+     buf_info.pQueueFamilyIndices   := nil;
+     buf_info.sharingMode           := VK_SHARING_MODE_EXCLUSIVE;
+     buf_info.flags                 := 0;
+     res := vkCreateBuffer( info_.device, @buf_info, nil, @info_.vertex_buffer.buf );
+     Assert( res = VK_SUCCESS );
+
+     vkGetBufferMemoryRequirements( info_.device, info_.vertex_buffer.buf, @mem_reqs );
+
+     alloc_info.sType           := VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+     alloc_info.pNext           := nil;
+     alloc_info.memoryTypeIndex := 0;
+
+     alloc_info.allocationSize := mem_reqs.size;
+     pass := memory_type_from_properties( info_, mem_reqs.memoryTypeBits,
+                                          Ord( VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT ) or Ord( VK_MEMORY_PROPERTY_HOST_COHERENT_BIT ),
+                                          alloc_info.memoryTypeIndex );
+     Assert( pass, 'No mappable, coherent memory' );
+
+     res := vkAllocateMemory( info_.device, @alloc_info, nil, @info_.vertex_buffer.mem );
+     Assert( res = VK_SUCCESS );
+     info_.vertex_buffer.buffer_info.range  := mem_reqs.size;
+     info_.vertex_buffer.buffer_info.offset := 0;
+
+     res := vkMapMemory( info_.device, info_.vertex_buffer.mem, 0, mem_reqs.size, 0, @pData );
+     Assert( res = VK_SUCCESS );
+
+     Move( vertexData_^, pData^, dataSize_ );
+
+     vkUnmapMemory( info_.device, info_.vertex_buffer.mem );
+
+     res := vkBindBufferMemory( info_.device, info_.vertex_buffer.buf, info_.vertex_buffer.mem, 0 );
+     Assert( res = VK_SUCCESS );
+
+     info_.vi_binding.binding   := 0;
+     info_.vi_binding.inputRate := VK_VERTEX_INPUT_RATE_VERTEX;
+     info_.vi_binding.stride    := dataStride_;
+
+     info_.vi_attribs[0].binding     := 0;
+     info_.vi_attribs[0].location    := 0;
+     info_.vi_attribs[0].format      := VK_FORMAT_R32G32B32A32_SFLOAT;
+     info_.vi_attribs[0].offset      := 0;
+     info_.vi_attribs[1].binding     := 0;
+     info_.vi_attribs[1].location    := 1;
+     if use_texture_
+     then info_.vi_attribs[1].format := VK_FORMAT_R32G32_SFLOAT
+     else info_.vi_attribs[1].format := VK_FORMAT_R32G32B32A32_SFLOAT;
+     info_.vi_attribs[1].offset      := 16;
+end;
+
+procedure init_descriptor_pool( var info_:T_sample_info; use_texture_:T_bool );
+var
+   res             :VkResult;
+   type_count      :array [ 0..2-1 ] of VkDescriptorPoolSize;
+   descriptor_pool :VkDescriptorPoolCreateInfo;
+begin
+     (* DEPENDS on init_uniform_buffer() and
+      * init_descriptor_and_pipeline_layouts() *)
+
+     type_count[0].type_           := VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+     type_count[0].descriptorCount := 1;
+     if use_texture_ then
+     begin
+          type_count[1].type_           := VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+          type_count[1].descriptorCount := 1;
+     end;
+
+     descriptor_pool.sType              := VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+     descriptor_pool.pNext              := nil;
+     descriptor_pool.maxSets            := 1;
+     if use_texture_
+     then descriptor_pool.poolSizeCount := 2
+     else descriptor_pool.poolSizeCount := 1;
+     descriptor_pool.pPoolSizes         := @type_count[0];
+
+     res := vkCreateDescriptorPool( info_.device, @descriptor_pool, nil, @info_.desc_pool );
+     Assert( res = VK_SUCCESS );
+end;
+
+procedure init_descriptor_set( var info_:T_sample_info; use_texture_:T_bool );
+var
+   res        :VkResult;
+   alloc_info :array [ 0..1-1 ] of VkDescriptorSetAllocateInfo;
+   writes     :array [ 0..2-1 ] of VkWriteDescriptorSet;
+begin
+     (* DEPENDS on init_descriptor_pool() *)
+
+     alloc_info[0].sType              := VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+     alloc_info[0].pNext              := nil;
+     alloc_info[0].descriptorPool     := info_.desc_pool;
+     alloc_info[0].descriptorSetCount := NUM_DESCRIPTOR_SETS;
+     alloc_info[0].pSetLayouts        := @info_.desc_layout[0];
+
+     SetLength( info_.desc_set, NUM_DESCRIPTOR_SETS );
+     res := vkAllocateDescriptorSets( info_.device, @alloc_info[0], @info_.desc_set[0] );
+     Assert( res = VK_SUCCESS );
+
+     writes[0].sType           := VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+     writes[0].pNext           := nil;
+     writes[0].dstSet          := info_.desc_set[0];
+     writes[0].descriptorCount := 1;
+     writes[0].descriptorType  := VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+     writes[0].pBufferInfo     := @info_.uniform_data.buffer_info;
+     writes[0].dstArrayElement := 0;
+     writes[0].dstBinding      := 0;
+
+     if use_texture_ then
+     begin
+          writes[1].sType           := VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+          writes[1].dstSet          := info_.desc_set[0];
+          writes[1].dstBinding      := 1;
+          writes[1].descriptorCount := 1;
+          writes[1].descriptorType  := VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+          writes[1].pImageInfo      := @info_.texture_data.image_info;
+          writes[1].dstArrayElement := 0;
+     end;
+
+     if use_texture_
+     then vkUpdateDescriptorSets( info_.device, 2, @writes[0], 0, nil )
+     else vkUpdateDescriptorSets( info_.device, 1, @writes[0], 0, nil );
+end;
+
+procedure init_shaders( var info_:T_sample_info; const vertShaderCI_:P_VkShaderModuleCreateInfo; const fragShaderCI_:P_VkShaderModuleCreateInfo );
+var
+   res :VkResult;
+begin
+     if vertShaderCI_ <> nil then
+     begin
+          info_.shaderStages[0].sType               := VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+          info_.shaderStages[0].pNext               := nil;
+          info_.shaderStages[0].pSpecializationInfo := nil;
+          info_.shaderStages[0].flags               := 0;
+          info_.shaderStages[0].stage               := VK_SHADER_STAGE_VERTEX_BIT;
+          info_.shaderStages[0].pName               := 'main';
+          res := vkCreateShaderModule( info_.device, vertShaderCI_, nil, @info_.shaderStages[0].module );
+          Assert( res = VK_SUCCESS );
+     end;
+
+     if fragShaderCI_ <> nil then
+     begin
+          info_.shaderStages[1].sType               := VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+          info_.shaderStages[1].pNext               := nil;
+          info_.shaderStages[1].pSpecializationInfo := nil;
+          info_.shaderStages[1].flags               := 0;
+          info_.shaderStages[1].stage               := VK_SHADER_STAGE_FRAGMENT_BIT;
+          info_.shaderStages[1].pName               := 'main';
+          res := vkCreateShaderModule( info_.device, fragShaderCI_, nil, @info_.shaderStages[1].module );
+          Assert( res = VK_SUCCESS );
+     end;
+end;
+
+procedure destroy_descriptor_pool( var info_:T_sample_info );
+begin
+     vkDestroyDescriptorPool( info_.device, info_.desc_pool, nil );
+end;
+
+procedure destroy_vertex_buffer( var info_:T_sample_info );
+begin
+     vkDestroyBuffer( info_.device, info_.vertex_buffer.buf, nil );
+     vkFreeMemory( info_.device, info_.vertex_buffer.mem, nil );
+end;
+
+procedure destroy_shaders( var info_:T_sample_info );
+begin
+     vkDestroyShaderModule( info_.device, info_.shaderStages[0].module, nil );
+     vkDestroyShaderModule( info_.device, info_.shaderStages[1].module, nil );
 end;
 
 end. //######################################################################### ■
